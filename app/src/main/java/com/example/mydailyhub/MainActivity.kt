@@ -36,6 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.example.mydailyhub.ui.theme.MyDailyHubTheme
 import androidx.activity.viewModels
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
@@ -52,6 +56,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MyViewModel by viewModels()
@@ -112,11 +122,11 @@ class MyViewModel : ViewModel() {
 //
 //Requirements:
 //• DONE Three screens: DONE Notes (text entries), DONE Tasks (checkbox list), DONECalendar (static placeholder)
-//• Bottom navigation bar implemented with BottomNavigation and dynamic highlighting using currentBackStackEntryAsState()
-//• Use sealed route objects and manage screen transitions with popUpTo, launchSingleTop, and restoreState = true
-//• Each screen must maintain its state properly across recompositions (via ViewModel or hoisting)
+//• DONE Bottom navigation bar implemented with BottomNavigation and dynamic highlighting using currentBackStackEntryAsState()
+//• DONE Use sealed route objects and manage screen transitions with popUpTo, launchSingleTop, and restoreState = true
+//• DONE Each screen must maintain its state properly across recompositions (via ViewModel or hoisting)
 //• Show how navigation impacts the backstack behavior (test and document back button behavior)
-//• Add icons to BottomNavigationItem using Icons.Default.*; Animate screen transitions using navigation arguments
+//• DONE Add icons to BottomNavigationItem using Icons.Default.*; Animate screen transitions using navigation arguments
 
 // nav forms
 sealed class Routes(val route : String, val title : String, val icon : ImageVector) {
@@ -134,7 +144,6 @@ val bottomNavScreens = listOf(
 )
 
 // main screen
-
 @Composable
 fun MyApp(viewModel: MyViewModel = MyViewModel()) {
     // create navController instance
@@ -189,14 +198,26 @@ fun MyApp(viewModel: MyViewModel = MyViewModel()) {
             modifier = Modifier.padding(innerPadding) // Apply padding from the Scaffold.
         ) {
             // Define a composable for each screen in our navigation graph.
-            composable(route = "home") {
+            composable(route = "home",
+                enterTransition = { fadeIn() + slideInHorizontally(initialOffsetX = { it }) },
+                exitTransition = { fadeOut() + slideOutHorizontally(targetOffsetX = { -it }) }
+            ) {
                 HomeScreen(navController = navController)
             }
-            composable(Routes.Notes.route) {
+            composable(Routes.Notes.route,
+                enterTransition = { fadeIn() + slideInHorizontally(initialOffsetX = { it }) },
+                exitTransition = { fadeOut() + slideOutHorizontally(targetOffsetX = { -it }) }
+            ) {
                 NotesScreen(navController = navController, viewModel)
             }
-            composable(Routes.Tasks.route) { TasksScreen(viewModel) }
-            composable(Routes.Calendar.route) { CalendarScreen() }
+            composable(Routes.Tasks.route,
+                enterTransition = { fadeIn() + slideInHorizontally(initialOffsetX = { it }) },
+                exitTransition = { fadeOut() + slideOutHorizontally(targetOffsetX = { -it }) }
+            ) { TasksScreen(viewModel) }
+            composable(Routes.Calendar.route,
+                enterTransition = { fadeIn() + slideInHorizontally(initialOffsetX = { it }) },
+                exitTransition = { fadeOut() + slideOutHorizontally(targetOffsetX = { -it }) }
+            ) { CalendarScreen() }
         }
     }
 }
